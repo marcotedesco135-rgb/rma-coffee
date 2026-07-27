@@ -113,8 +113,30 @@ input[type=text]{
 }
 input[type=text]:focus{border-color:var(--caramel);}
 
-.photo-row{
+.name-row{
   display:flex; align-items:center; gap:14px; margin-bottom:18px;
+}
+.name-row input[type=text]{margin-bottom:0;}
+
+.quick-names{
+  display:flex; flex-wrap:wrap; gap:8px;
+  margin-bottom:18px;
+}
+.quick-chip{
+  background:#fff;
+  border:2px solid #e3cba3;
+  color:var(--roast);
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:13px;
+  cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+}
+.quick-chip:active{transform:scale(0.95);}
+.quick-chip .dot{
+  width:8px; height:8px; border-radius:50%;
+  display:inline-block;
 }
 .avatar-preview{
   width:64px; height:64px; border-radius:50%;
@@ -329,14 +351,15 @@ input[type=file]{display:none;}
 
   <div id="view-registra">
     <div class="card">
-      <label class="field-label">Il tuo nome</label>
-      <input type="text" id="nameInput" placeholder="es. Marco" maxlength="24">
+      <div id="quickNamesZone" style="display:none;">
+        <label class="field-label">Sei già nell'elenco?</label>
+        <div class="quick-names" id="quickNames"></div>
+      </div>
 
-      <label class="field-label">Foto (facoltativa)</label>
-      <div class="photo-row">
+      <label class="field-label">Il tuo nome</label>
+      <div class="name-row">
         <div class="avatar-preview" id="avatarPreview">🙂</div>
-        <label class="upload-btn" for="photoInput">📷 Carica foto</label>
-        <input type="file" id="photoInput" accept="image/*">
+        <input type="text" id="nameInput" placeholder="es. Marco" maxlength="24">
       </div>
 
       <label class="field-label" style="text-align:center; display:block;">Quanti caffè offri oggi?</label>
@@ -350,6 +373,7 @@ input[type=file]{display:none;}
       <button class="submit-btn" id="submitBtn" onclick="registraCaffe()">☕ Registra i caffè</button>
       <div class="hint">Il conteggio è condiviso con tutto il gruppo</div>
     </div>
+
   </div>
 
   <div id="view-classifica" style="display:none;">
@@ -371,7 +395,7 @@ input[type=file]{display:none;}
   <div class="modal-box">
     <div class="icon">🧹</div>
     <h3>Azzerare la classifica?</h3>
-    <p>Tutti i conteggi torneranno a zero per tutti. Non si può annullare.</p>
+    <p>Tutti i nomi e i conteggi spariranno per tutti. Si riparte da un elenco vuoto. Non si può annullare.</p>
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeResetModal()">Annulla</button>
       <button class="modal-confirm" onclick="confirmReset()">Sì, azzera</button>
@@ -395,7 +419,6 @@ const API_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
 const CONFIGURED = BLOB_ID !== "INSERISCI_BLOB_ID_QUI" && BLOB_ID.length > 0;
 
 let currentCount = 1;
-let photoDataUrl = null;
 let currentTab = 'registra';
 let pollTimer = null;
 const MYNAME_KEY = 'rma-my-name';
@@ -430,6 +453,7 @@ function switchTab(tab){
     clearInterval(pollTimer);
     pollTimer = setInterval(loadBoard, 6000);
   } else {
+    loadQuickNames();
     clearInterval(pollTimer);
   }
 }
@@ -440,34 +464,29 @@ function changeCount(delta){
   document.getElementById('cupsPreview').textContent = '☕'.repeat(Math.min(currentCount,10));
 }
 
-document.getElementById('photoInput').addEventListener('change', function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    const img = new Image();
-    img.onload = function(){
-      const size = 120;
-      const canvas = document.createElement('canvas');
-      canvas.width = size; canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      const scale = Math.max(size/img.width, size/img.height);
-      const w = img.width*scale, h = img.height*scale;
-      ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
-      photoDataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      const prev = document.getElementById('avatarPreview');
-      prev.innerHTML = '';
-      const imgEl = document.createElement('img');
-      imgEl.src = photoDataUrl;
-      prev.appendChild(imgEl);
-    };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-});
+function selectQuickName(name){
+  document.getElementById('nameInput').value = name;
+  document.getElementById('nameInput').dispatchEvent(new Event('input'));
+}
+
+async function loadQuickNames(){
+  const data = await loadData();
+  const zone = document.getElementById('quickNamesZone');
+  const container = document.getElementById('quickNames');
+  if(!data.people.length){
+    zone.style.display = 'none';
+    return;
+  }
+  zone.style.display = 'block';
+  const sorted = [...data.people].sort((a,b)=>a.name.localeCompare(b.name));
+  container.innerHTML = sorted.map(p =>
+    `<button type="button" class="quick-chip" onclick="selectQuickName('${p.name.replace(/'/g,"\\'")}')">
+      <span class="dot" style="background:${colorFor(p.name)}"></span>${escapeHtml(p.name)}
+    </button>`
+  ).join('');
+}
 
 document.getElementById('nameInput').addEventListener('input', function(){
-  if(!photoDataUrl){
     const n = this.value.trim();
     const prev = document.getElementById('avatarPreview');
     if(n){
@@ -477,7 +496,6 @@ document.getElementById('nameInput').addEventListener('input', function(){
       prev.style.background = 'var(--roast)';
       prev.textContent = '🙂';
     }
-  }
 });
 
 async function loadData(){
@@ -523,12 +541,11 @@ async function registraCaffe(){
     let person = data.people.find(p => p.name.toLowerCase() === key);
     if(person){
       person.total = (person.total||0) + currentCount;
-      if(photoDataUrl) person.photo = photoDataUrl;
     } else {
       person = {
         id: key + '-' + Date.now(),
         name: name,
-        photo: photoDataUrl || null,
+        photo: null,
         total: currentCount
       };
       data.people.push(person);
@@ -572,14 +589,12 @@ function closeResetModal(){
 async function confirmReset(){
   closeResetModal();
   try{
-    const data = await loadData();
-    data.people.forEach(p => p.total = 0);
-    data.logs = [];
-    data.lastReset = Date.now();
+    const data = {people: [], logs: [], lastReset: Date.now()};
     const ok = await saveData(data);
     if(ok){
-      showToast('🧹 Classifica azzerata per tutti!');
+      showToast('🧹 Tutto azzerato, si riparte da zero!');
       loadBoard();
+      loadQuickNames();
     } else {
       showToast('❌ Errore, riprova');
     }
@@ -655,6 +670,7 @@ function escapeHtml(s){
       prev.textContent = initials(saved);
     }
   }catch(e){}
+  if(CONFIGURED) loadQuickNames();
 })();
 </script>
 </body>
