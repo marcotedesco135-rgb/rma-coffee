@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>RMA Coffee</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root{
+  --espresso:#2E1B12;
+  --roast:#6F4436;
+  --latte:#F3E5D3;
+  --cream:#FFF9F0;
+  --caramel:#E0912F;
+  --teal:#3F8C81;
+  --teal-dark:#2C665D;
+  --danger:#C0392B;
+  --shadow: 0 6px 18px rgba(46,27,18,0.15);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Nunito',sans-serif;
+  background: radial-gradient(circle at 20% 0%, #fff3e2 0%, var(--latte) 45%, #ead4b8 100%);
+  color: var(--espresso);
+  min-height:100vh;
+  padding-bottom:40px;
+}
+.wrap{max-width:480px; margin:0 auto; padding:16px;}
+
+/* HEADER */
+.header{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding: 18px 10px 8px;
+}
+.header h1{
+  font-family:'Baloo 2', cursive;
+  font-size:28px;
+  margin:0;
+  color:var(--roast);
+  letter-spacing:0.5px;
+}
+.header .bean{font-size:26px; transform: rotate(-15deg); display:inline-block;}
+.tagline{
+  text-align:center;
+  font-size:13px;
+  color:var(--roast);
+  opacity:0.75;
+  margin:-4px 0 18px;
+  font-weight:600;
+}
+
+/* TABS */
+.tabs{
+  display:flex;
+  background: var(--cream);
+  border-radius: 999px;
+  padding:5px;
+  box-shadow: var(--shadow);
+  margin-bottom:20px;
+}
+.tab-btn{
+  flex:1;
+  border:none;
+  background:transparent;
+  padding:12px 8px;
+  font-family:'Baloo 2', cursive;
+  font-size:15px;
+  font-weight:700;
+  color:var(--roast);
+  border-radius:999px;
+  cursor:pointer;
+  transition: all .25s ease;
+  opacity:0.55;
+}
+.tab-btn.active{
+  background: linear-gradient(135deg, var(--caramel), #c9761f);
+  color:#fff;
+  opacity:1;
+  box-shadow: 0 4px 10px rgba(224,145,47,0.45);
+}
+
+.card{
+  background: var(--cream);
+  border-radius:22px;
+  padding:22px;
+  box-shadow: var(--shadow);
+  margin-bottom:16px;
+}
+
+/* FORM */
+label.field-label{
+  display:block;
+  font-weight:800;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:0.6px;
+  color:var(--roast);
+  margin-bottom:6px;
+}
+input[type=text]{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  border:2px solid #e3cba3;
+  background:#fffdf9;
+  font-size:16px;
+  font-family:'Nunito',sans-serif;
+  color:var(--espresso);
+  margin-bottom:16px;
+  outline:none;
+}
+input[type=text]:focus{border-color:var(--caramel);}
+
+.photo-row{
+  display:flex; align-items:center; gap:14px; margin-bottom:18px;
+}
+.avatar-preview{
+  width:64px; height:64px; border-radius:50%;
+  background: var(--roast);
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Baloo 2', cursive;
+  font-size:22px;
+  overflow:hidden;
+  flex-shrink:0;
+  border:3px solid var(--caramel);
+}
+.avatar-preview img{width:100%; height:100%; object-fit:cover;}
+.upload-btn{
+  background:#fff;
+  border:2px dashed #d3ab72;
+  color:var(--roast);
+  padding:10px 14px;
+  border-radius:14px;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+}
+input[type=file]{display:none;}
+
+.stepper{
+  display:flex; align-items:center; justify-content:center; gap:18px;
+  margin: 6px 0 22px;
+}
+.step-btn{
+  width:48px; height:48px; border-radius:50%;
+  border:none;
+  background: var(--roast);
+  color:#fff;
+  font-size:22px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+.step-btn:active{transform:scale(0.92);}
+.step-count{
+  font-family:'Baloo 2', cursive;
+  font-size:44px;
+  color:var(--caramel);
+  min-width:70px;
+  text-align:center;
+}
+.step-cups{font-size:13px; text-align:center; color:var(--roast); opacity:0.7; margin-top:-14px; margin-bottom:18px;}
+
+.submit-btn{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color:#fff;
+  font-family:'Baloo 2', cursive;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow: 0 6px 14px rgba(63,140,129,0.4);
+}
+.submit-btn:active{transform: scale(0.98);}
+.submit-btn:disabled{opacity:0.5;}
+
+.toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+  background: var(--espresso); color:#fff;
+  padding:12px 20px; border-radius:14px;
+  font-weight:700; font-size:14px;
+  opacity:0; transition: all .35s ease;
+  pointer-events:none;
+  z-index:50;
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  max-width:90%;
+  text-align:center;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* LEADERBOARD */
+.board-row{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 8px;
+  border-bottom:1px solid #ecdcc0;
+}
+.board-row:last-child{border-bottom:none;}
+.rank{
+  font-family:'Baloo 2', cursive;
+  font-size:20px;
+  width:34px;
+  text-align:center;
+  color:var(--roast);
+  flex-shrink:0;
+}
+.board-row.me{background:rgba(63,140,129,0.1); border-radius:14px;}
+.b-avatar{
+  width:46px;height:46px;border-radius:50%;
+  background:var(--roast); color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2', cursive; font-size:16px;
+  overflow:hidden; flex-shrink:0;
+  border:2px solid var(--caramel);
+}
+.b-avatar img{width:100%;height:100%;object-fit:cover;}
+.b-info{flex:1; min-width:0;}
+.b-name{font-weight:800; font-size:15px; color:var(--espresso); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.b-beans{font-size:12px; opacity:0.75; letter-spacing:1px;}
+
+.cupgauge{width:30px; height:40px; flex-shrink:0;}
+.b-total{
+  font-family:'Baloo 2', cursive;
+  font-size:20px;
+  color:var(--caramel);
+  width:34px;
+  text-align:right;
+  flex-shrink:0;
+}
+
+.empty-state{
+  text-align:center;
+  padding: 30px 10px;
+  color:var(--roast);
+  opacity:0.7;
+  font-weight:600;
+}
+.empty-state .big{font-size:40px; display:block; margin-bottom:10px;}
+
+.steam{
+  animation: rise 2.2s ease-in-out infinite;
+}
+@keyframes rise{
+  0%{opacity:0; transform:translateY(0) scale(1);}
+  30%{opacity:0.8;}
+  100%{opacity:0; transform:translateY(-14px) scale(1.3);}
+}
+.spin{animation: spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.hint{font-size:12px; color:var(--roast); opacity:0.65; text-align:center; margin-top:6px;}
+
+.reset-zone{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px dashed #e3cba3;
+  text-align:center;
+}
+.reset-btn{
+  background:#fff;
+  border:2px solid var(--danger);
+  color:var(--danger);
+  padding:10px 18px;
+  border-radius:14px;
+  font-weight:800;
+  font-size:13px;
+  cursor:pointer;
+  font-family:'Nunito',sans-serif;
+}
+.reset-btn:active{transform:scale(0.96);}
+.last-reset{
+  font-size:11px;
+  color:var(--roast);
+  opacity:0.6;
+  margin-top:8px;
+}
+
+/* modal conferma */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(46,27,18,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:80; padding:20px;
+}
+.modal-box{
+  background:var(--cream);
+  border-radius:20px;
+  padding:24px;
+  max-width:340px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+.modal-box .icon{font-size:38px; margin-bottom:8px;}
+.modal-box h3{
+  font-family:'Baloo 2', cursive;
+  color:var(--espresso);
+  margin:0 0 8px;
+  font-size:19px;
+}
+.modal-box p{font-size:14px; color:var(--roast); margin:0 0 20px;}
+.modal-actions{display:flex; gap:10px;}
+.modal-actions button{
+  flex:1;
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+  font-family:'Nunito',sans-serif;
+}
+.modal-cancel{background:#fff; color:var(--roast); border:2px solid #e3cba3 !important;}
+.modal-confirm{background:var(--danger); color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header"><span class="bean">🫘</span><h1>RMA Coffee</h1><span class="bean" style="transform:rotate(15deg);">☕</span></div>
+  <div class="tagline">chi offre il prossimo giro?</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-registra" onclick="switchTab('registra')">☕ Registra</button>
+    <button class="tab-btn" id="tab-btn-classifica" onclick="switchTab('classifica')">🏆 Classifica</button>
+  </div>
+
+  <div id="view-registra">
+    <div class="card">
+      <label class="field-label">Il tuo nome</label>
+      <input type="text" id="nameInput" placeholder="es. Marco" maxlength="24">
+
+      <label class="field-label">Foto (facoltativa)</label>
+      <div class="photo-row">
+        <div class="avatar-preview" id="avatarPreview">🙂</div>
+        <label class="upload-btn" for="photoInput">📷 Carica foto</label>
+        <input type="file" id="photoInput" accept="image/*">
+      </div>
+
+      <label class="field-label" style="text-align:center; display:block;">Quanti caffè offri oggi?</label>
+      <div class="stepper">
+        <button class="step-btn" onclick="changeCount(-1)">−</button>
+        <div class="step-count" id="countDisplay">1</div>
+        <button class="step-btn" onclick="changeCount(1)">+</button>
+      </div>
+      <div class="step-cups" id="cupsPreview">☕</div>
+
+      <button class="submit-btn" id="submitBtn" onclick="registraCaffe()">☕ Registra i caffè</button>
+      <div class="hint">Il conteggio è condiviso con tutto il gruppo</div>
+    </div>
+  </div>
+
+  <div id="view-classifica" style="display:none;">
+    <div class="card">
+      <div id="boardContainer">
+        <div class="empty-state"><span class="big">⏳</span>Caricamento classifica...</div>
+      </div>
+      <div class="reset-zone" id="resetZone" style="display:none;">
+        <button class="reset-btn" onclick="askReset()">🔄 Azzera classifica</button>
+        <div class="last-reset" id="lastResetLabel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="resetModal" style="display:none;">
+  <div class="modal-box">
+    <div class="icon">🧹</div>
+    <h3>Azzerare la classifica?</h3>
+    <p>Tutti i conteggi torneranno a zero per tutti. Non si può annullare.</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeResetModal()">Annulla</button>
+      <button class="modal-confirm" onclick="confirmReset()">Sì, azzera</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIGURAZIONE — DA FARE UNA SOLA VOLTA PRIMA DI PUBBLICARE
+   1. Vai su https://jsonblob.com
+   2. Cancella il JSON di esempio e incolla questo al suo posto:
+      {"people":[],"logs":[],"lastReset":null}
+   3. Clicca sul pulsante di salvataggio/creazione
+   4. Nella barra indirizzi (o nel link "view raw" del sito) troverai
+      un ID lungo tipo: 1234abcd-5678-90ef-... oppure una stringa alfanumerica
+   5. Incolla quell'ID qui sotto, al posto di "INSERISCI_BLOB_ID_QUI"
+   ============================================================ */
+const BLOB_ID = "019fa407-5a64-7d00-aa5d-1e60f8cac07a";
+const API_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
+const CONFIGURED = BLOB_ID !== "INSERISCI_BLOB_ID_QUI" && BLOB_ID.length > 0;
+
+let currentCount = 1;
+let photoDataUrl = null;
+let currentTab = 'registra';
+let pollTimer = null;
+const MYNAME_KEY = 'rma-my-name';
+
+const AVATAR_COLORS = ['#6F4436','#3F8C81','#C0392B','#8E6C33','#4A6FA5','#7A5C8E'];
+
+function colorFor(name){
+  let h = 0;
+  for(let i=0;i<name.length;i++){ h = name.charCodeAt(i) + ((h<<5)-h); }
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function initials(name){
+  return name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+}
+
+function showToast(msg, ms=2600){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById('tab-btn-registra').classList.toggle('active', tab==='registra');
+  document.getElementById('tab-btn-classifica').classList.toggle('active', tab==='classifica');
+  document.getElementById('view-registra').style.display = tab==='registra' ? 'block' : 'none';
+  document.getElementById('view-classifica').style.display = tab==='classifica' ? 'block' : 'none';
+  if(tab === 'classifica'){
+    loadBoard();
+    clearInterval(pollTimer);
+    pollTimer = setInterval(loadBoard, 6000);
+  } else {
+    clearInterval(pollTimer);
+  }
+}
+
+function changeCount(delta){
+  currentCount = Math.min(10, Math.max(1, currentCount + delta));
+  document.getElementById('countDisplay').textContent = currentCount;
+  document.getElementById('cupsPreview').textContent = '☕'.repeat(Math.min(currentCount,10));
+}
+
+document.getElementById('photoInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = function(){
+      const size = 120;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(size/img.width, size/img.height);
+      const w = img.width*scale, h = img.height*scale;
+      ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+      photoDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      const prev = document.getElementById('avatarPreview');
+      prev.innerHTML = '';
+      const imgEl = document.createElement('img');
+      imgEl.src = photoDataUrl;
+      prev.appendChild(imgEl);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('nameInput').addEventListener('input', function(){
+  if(!photoDataUrl){
+    const n = this.value.trim();
+    const prev = document.getElementById('avatarPreview');
+    if(n){
+      prev.style.background = colorFor(n);
+      prev.textContent = initials(n);
+    } else {
+      prev.style.background = 'var(--roast)';
+      prev.textContent = '🙂';
+    }
+  }
+});
+
+async function loadData(){
+  try{
+    const res = await fetch(API_URL, {headers:{'Accept':'application/json'}});
+    if(!res.ok) return {people:[], logs:[], lastReset:null};
+    const data = await res.json();
+    if(!data.people) data.people = [];
+    if(!data.logs) data.logs = [];
+    return data;
+  }catch(e){
+    console.error('Errore caricamento', e);
+    return {people:[], logs:[], lastReset:null};
+  }
+}
+async function saveData(data){
+  try{
+    const res = await fetch(API_URL, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  }catch(e){
+    console.error('Errore salvataggio', e);
+    return false;
+  }
+}
+
+async function registraCaffe(){
+  const name = document.getElementById('nameInput').value.trim();
+  if(!name){
+    showToast('⚠️ Inserisci il tuo nome prima di registrare');
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Salvataggio...';
+
+  try{
+    const data = await loadData();
+    const key = name.toLowerCase();
+    let person = data.people.find(p => p.name.toLowerCase() === key);
+    if(person){
+      person.total = (person.total||0) + currentCount;
+      if(photoDataUrl) person.photo = photoDataUrl;
+    } else {
+      person = {
+        id: key + '-' + Date.now(),
+        name: name,
+        photo: photoDataUrl || null,
+        total: currentCount
+      };
+      data.people.push(person);
+    }
+    data.logs.push({personId: person.id, amount: currentCount, ts: Date.now()});
+    const ok = await saveData(data);
+    if(ok){
+      try{ localStorage.setItem(MYNAME_KEY, name); }catch(e){}
+      showToast(`☕ Registrati ${currentCount} caffè per ${name}! Totale: ${person.total}`);
+      currentCount = 1;
+      document.getElementById('countDisplay').textContent = '1';
+      document.getElementById('cupsPreview').textContent = '☕';
+      switchTab('classifica');
+    } else {
+      showToast('❌ Errore nel salvataggio, riprova');
+    }
+  }catch(e){
+    showToast('❌ Qualcosa è andato storto, riprova');
+  }
+  btn.disabled = false;
+  btn.textContent = '☕ Registra i caffè';
+}
+
+function cupGaugeSVG(pct, isTop){
+  const fillH = Math.max(2, Math.round(28 * pct));
+  const y = 32 - fillH;
+  return `<svg class="cupgauge" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+    ${isTop ? `<g class="steam"><path d="M11 4 Q9 1 11 -2" stroke="#B08863" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M19 4 Q17 1 19 -2" stroke="#B08863" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>` : ''}
+    <rect x="3" y="6" width="24" height="26" rx="4" fill="#fff" stroke="#D3AB72" stroke-width="2"/>
+    <rect x="5" y="${y+6}" width="20" height="${fillH}" rx="2" fill="${isTop ? '#E0912F' : '#C68958'}"/>
+    <path d="M27 10 h3 a4 4 0 0 1 0 12 h-3" fill="none" stroke="#D3AB72" stroke-width="2"/>
+  </svg>`;
+}
+
+function askReset(){
+  document.getElementById('resetModal').style.display = 'flex';
+}
+function closeResetModal(){
+  document.getElementById('resetModal').style.display = 'none';
+}
+async function confirmReset(){
+  closeResetModal();
+  try{
+    const data = await loadData();
+    data.people.forEach(p => p.total = 0);
+    data.logs = [];
+    data.lastReset = Date.now();
+    const ok = await saveData(data);
+    if(ok){
+      showToast('🧹 Classifica azzerata per tutti!');
+      loadBoard();
+    } else {
+      showToast('❌ Errore, riprova');
+    }
+  }catch(e){
+    showToast('❌ Errore, riprova');
+  }
+}
+function formatResetDate(ts){
+  const d = new Date(ts);
+  return 'Ultimo azzeramento: ' + d.toLocaleDateString('it-IT', {day:'numeric', month:'short'}) + ' alle ' + d.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+}
+
+async function loadBoard(){
+  const data = await loadData();
+  const container = document.getElementById('boardContainer');
+  const resetZone = document.getElementById('resetZone');
+  if(!data.people.length){
+    container.innerHTML = `<div class="empty-state"><span class="big">🫗</span>Nessun caffè registrato ancora.<br>Vai su "Registra" per il primo giro!</div>`;
+    resetZone.style.display = 'none';
+    return;
+  }
+  resetZone.style.display = 'block';
+  document.getElementById('lastResetLabel').textContent = data.lastReset ? formatResetDate(data.lastReset) : '';
+  const sorted = [...data.people].sort((a,b)=>b.total-a.total);
+  const maxTotal = sorted[0].total || 1;
+  let myName = '';
+  try{
+    myName = localStorage.getItem(MYNAME_KEY) || '';
+  }catch(e){}
+
+  const medals = ['🥇','🥈','🥉'];
+  container.innerHTML = sorted.map((p, i) => {
+    const isMe = p.name.toLowerCase() === myName.toLowerCase();
+    const rankDisplay = i < 3 ? medals[i] : (i+1);
+    const avatarInner = p.photo
+      ? `<img src="${p.photo}">`
+      : `<span>${initials(p.name)}</span>`;
+    const avatarBg = p.photo ? '' : `style="background:${colorFor(p.name)}"`;
+    const beans = '🫘'.repeat(Math.min(p.total, 5)) + (p.total > 5 ? ` +${p.total-5}` : '');
+    const pct = p.total / maxTotal;
+    return `<div class="board-row ${isMe?'me':''}">
+      <div class="rank">${rankDisplay}</div>
+      <div class="b-avatar" ${avatarBg}>${avatarInner}</div>
+      <div class="b-info">
+        <div class="b-name">${escapeHtml(p.name)}${isMe?' (tu)':''}</div>
+        <div class="b-beans">${beans}</div>
+      </div>
+      ${cupGaugeSVG(pct, i===0)}
+      <div class="b-total">${p.total}</div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// init: prefill name if remembered + check configuration
+(function init(){
+  if(!CONFIGURED){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#C0392B;color:#fff;padding:12px 16px;border-radius:14px;margin-bottom:14px;font-size:13px;font-weight:700;text-align:center;';
+    banner.innerHTML = '⚠️ Configurazione non completata: apri il codice sorgente e sostituisci BLOB_ID con il tuo ID di jsonblob.com prima di usare l\'app.';
+    document.querySelector('.wrap').insertBefore(banner, document.querySelector('.tabs'));
+    document.getElementById('submitBtn').disabled = true;
+  }
+  try{
+    const saved = localStorage.getItem(MYNAME_KEY);
+    if(saved){
+      document.getElementById('nameInput').value = saved;
+      const prev = document.getElementById('avatarPreview');
+      prev.style.background = colorFor(saved);
+      prev.textContent = initials(saved);
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
